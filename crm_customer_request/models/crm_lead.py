@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-    
 from odoo import models, fields, api
+from odoo.exceptions import ValidationError
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
@@ -29,3 +30,11 @@ class CrmLead(models.Model):
                 lead.opportunity_state = 'new'
             else:
                 lead.opportunity_state = 'other'
+
+    @api.constrains('opportunity_state')
+    def _check_opportunity_state (self):
+        for lead in self:
+            if lead.opportunity_state == 'new':
+                continue
+            else:
+                raise ValidationError("Can not modify record")
