@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="quotation_action" model="ir.actions.act_window">
+            <field name="name">Create Quotation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="sale_management.sale_order_form_quote"/>
+            <field name="context">{'default_opportunity_id': active_id or False}</field>
+        </record>
+    </data>
+</odoo>

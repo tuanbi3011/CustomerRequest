@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
-from . import models
 from . import customer_request
+from . import crm_lead
