@@ -25,6 +25,7 @@
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
+        'wizard/crm_lead_excel_view.xml',
         'views/quotation_view.xml',
         'views/crm_lead_inherit.xml',
         'views/crm_lead_form.xml',
