@@ -31,4 +31,15 @@
            name="Import Customers"
            action="crm_lead_excel_action"
            parent="crm.crm_menu_root"/>
+<!--
+    <record id="view_crm_lead_form_inherit" model="ir.ui.view">
+        <field name="name">crm.lead.form.excel.inherit</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_import_customer" string="Import Excel" type="object" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>-->
 </odoo>

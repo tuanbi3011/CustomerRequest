@@ -15,21 +15,30 @@ class CrmLeadExcel(models.TransientModel):
             ws = wb.active
             for record in ws.iter_rows(min_row=2, max_row=None, min_col=None,max_col=None, values_only=True):
 # search if the customer exist else create
-                search = self.env['res.partner'].search([
-                    ('name', '=', record[1]),
-                    ('customer_rank', '=', True)])
+                search = self.env['crm.lead'].search([
+                    ('name', '=', record[1])])
                 if not search:
-                    self.env['res.partner'].create({
-                            'ref': record[0],
+                    self.env['crm.lead'].create({
+                            'email': record[0],
                             'name': record[1],
-                            'street': record[2],
-                            'state_id': self.env['res.country.state'].search([
-                                        ('name', '=', record[3])]).id,
-                                        'country_id': self.env['res.country'].search([
-                                                        ('code', '=', record[4])]).id,
-                                                        'zip': record[5],
-                                                        'phone': record[6],
-                                                        'email': record[7],
-                                                        'customer_rank': True})
+                            'date_close': record[2],
+                            'phone': record[3],
+                            'private_note': record[4],
+                            'customer_request': record[5]})
         except:
             raise UserError(_('Please insert a valid file'))
+
+#    def action_import_customer(self):
+#        return {
+#            'name': 'Import Customer',
+#            'type': 'ir.actions.act_window',
+#            'res_model': 'crm.lead.form.excel.inherit',
+#            'view_mode': 'form',
+#            'view_type': 'form',
+#            'target': 'new',
+#        }
+
+#    @property
+#    def action_lost_reason_apply(self):
+#        leads = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+#        return leads.action_set_lost(lost_reason=self.file.id)
