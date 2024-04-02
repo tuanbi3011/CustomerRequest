@@ -32,12 +32,12 @@ class LeadAPI(http.Controller):
             # Nếu sản phẩm không tồn tại, bỏ qua
             if not product:
                 continue
-        request_vals = {
-            'product_id': product.id,
-            'product_uom_qty': quantity,
-            'date_planned': request_date,
-            'lead_id': new_lead.id,  # Liên kết yêu cầu với lead mới
-        }
-        request_obj = request.env['sale.order.line'].create(request_vals)
+#        request_vals = {
+#            'product_id': product.id,
+#            'product_uom_qty': quantity,
+#            'date_planned': request_date,
+#            'lead_id': new_lead.id,  # Liên kết yêu cầu với lead mới
+#        }
+#        request_obj = request.env['sale.order.line'].create(request_vals)
 
         return {'success': True, 'lead_id': new_lead.id}

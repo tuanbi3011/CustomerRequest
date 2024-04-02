@@ -1,29 +1,37 @@
 # -*- coding: utf-8 -*-    
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from odoo.http import request
+
 
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
-
-    request_ids = fields.One2many('crm.customer.request', 'opportunity_id') 
-    total_sales = fields.Monetary(compute='_compute_total_sales', currency_field='company_currency', string='Total Sales', tracking=True, store=True)
-    expected_revenue = fields.Monetary(compute='_compute_expected_revenue', currency_field='company_currency', string='Expected Revenue', tracking=True)
+    request_ids = fields.One2many('crm.customer.request', 'opportunity_id')
+    total_sales = fields.Monetary(compute='_compute_total_sales', currency_field='company_currency',
+                                  string='Total Sales', tracking=True, store=True)
+    expected_revenue = fields.Monetary(compute='_compute_expected_revenue', currency_field='company_currency',
+                                       string='Expected Revenue', tracking=True)
     opportunity_state = fields.Selection([
         ('new', 'New'),
         ('other', 'Other')
     ], string='Opportunity State', compute='_compute_opportunity_state', store=True)
     request_line_ids = fields.One2many('crm.customer.request', 'product_id')
+
     @api.depends('request_ids')
     def _compute_total_sales(self):
         for lead in self:
-            lead.total_sales = sum(request.qty for request in lead.request_ids)
-    
+            total_sales = 0.0
+            for request in lead.request_ids:
+                total_sales += request.qty
+            lead.total_sales = total_sales
+
     @api.depends('request_ids')
     def _compute_expected_revenue(self):
         for lead in self:
-            expected_revenue = sum(request.product_id._list_price * request.qty for request in lead.request_ids)
-            lead.expected_revenue = expected_revenue
+            expected_revenue = 0.0
+            expected_revenue += request.product_id.list_price * request.qty
+        lead.expected_revenue = expected_revenue
 
     @api.depends('request_ids')
     def _compute_opportunity_state(self):
@@ -32,14 +40,14 @@ class CrmLead(models.Model):
                 lead.opportunity_state = 'new'
             else:
                 lead.opportunity_state = 'other'
-    
-    @api.constrains('opportunity_state')
-    def _check_opportunity_state (self):
-        for lead in self:
-            if lead.opportunity_state == 'new':
-                continue
-            else:
-                raise ValidationError("Can not modify record")
+
+#    @api.constrains('opportunity_state')
+#    def _check_opportunity_state(self):
+#        for lead in self:
+#            if lead.opportunity_state == 'new':
+#                continue
+#            else:
+#                raise ValidationError("Can not modify record")
 
     @api.model
     def create_quotation_from_opportunity(self, opportunity_id):
@@ -64,4 +72,15 @@ class CrmLead(models.Model):
             'res_model': 'sale.order',
             'view_mode': 'form',
             'res_id': sale_order.id,
+        }
+
+    @api.model
+    def action_import_customer(self):
+        return {
+            'name': 'Import Customer',
+            'type': 'ir.actions.act_window',
+            'res_model': 'crm.lead.form.excel.inherit',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'target': 'new',
         }
