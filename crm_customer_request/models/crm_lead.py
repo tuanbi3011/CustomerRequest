@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-    
+# -*- coding: utf-8 -*-
+import requests
+
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-from odoo.http import request
 
 
 class CrmLead(models.Model):
@@ -21,17 +22,13 @@ class CrmLead(models.Model):
     @api.depends('request_ids')
     def _compute_total_sales(self):
         for lead in self:
-            total_sales = 0.0
-            for request in lead.request_ids:
-                total_sales += request.qty
-            lead.total_sales = total_sales
+            lead.total_sales = sum(lead.request_ids.mapped('qty'))
 
     @api.depends('request_ids')
     def _compute_expected_revenue(self):
         for lead in self:
-            expected_revenue = 0.0
-            expected_revenue += request.product_id.list_price * request.qty
-        lead.expected_revenue = expected_revenue
+            total_sale = sum(request.qty * requests.product_id.list_price for request in lead.request_ids)
+            lead.expected_revenue = total_sale
 
     @api.depends('request_ids')
     def _compute_opportunity_state(self):
